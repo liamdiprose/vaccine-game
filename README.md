@@ -12,7 +12,7 @@ Interactive Game level with possible extra information slides that demonstrate h
 * Michael Cowie
 
 
-We plan to base the game off the 
+We plan to base the game off the Kurzgesagt video on vaccines:
 
 https://www.youtube.com/watch?v=zBkVCpbNnkU
 
@@ -37,4 +37,4 @@ Each level is an open-plan tower-defence that is analogous to the immune system.
 
 ## 24 Hour deadline
 
-* Use 
+* Use art from video
