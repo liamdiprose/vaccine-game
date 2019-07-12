@@ -1,6 +1,16 @@
 # Vaccine Game
 
+
 Interactive Game level with possible extra information slides that demonstrate how vaccines work.
+
+---
+
+## Members
+
+* Liam Diprose 
+* Max Clarke
+* Michael Cowie
+
 
 We plan to base the game off the 
 
