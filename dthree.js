@@ -1,5 +1,62 @@
 let game = d3.select("#game")
 
+let body_parts = [
+    {
+        name: "Head",
+        value: 0,
+        images: [
+            {
+                name: "Fine",
+                image: "img/person-head-normal.png",
+            },
+            {
+                name: "Not Feeling Great",
+                image: "img/person-head-mild.png",
+            },
+            {
+                name: "Severe Nausea",
+                image: "img/person-head-severe.png",
+            }
+        ]
+    },
+    {
+        name: "Torso",
+        value: 0,
+        images: [
+            {
+                name: "Normal",
+                image: "img/person-torso-normal.png",
+            },
+            {
+                name: "Mild Rash",
+                image: "img/person-torso-mild.png",
+            },
+            {
+                name: "Severe Rash",
+                image: "img/person-torso-severe.png",
+            }
+        ]
+    },
+    {
+        name: "Legs",
+        value: 0,
+        stages: [
+            {
+                name: "Legs",
+                image: "img/person-legs-normal.png",
+            },
+            {
+                name: "Cold Legs",
+                image: "img/person-legs-mild.png",
+            },
+            {
+                name: "Really Cold Legs",
+                image: "img/person-legs-severe.png",
+            }
+        ]
+    },
+];
+
 let types = {
     normal: {
         width: 30,
