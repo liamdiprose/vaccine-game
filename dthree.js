@@ -138,7 +138,6 @@ function frame() {
         cell.targeted = false;
     }
 
-    let toRemove = new Set();
     for (let v of virusData) {
         v.targeted = false;
     }
@@ -161,16 +160,6 @@ function frame() {
             }
         }
     }
-
-    // for (let virus of toRemove) {
-    //     virusData.splice(virusData.find(v => v === virus), 1);
-    //     console.log("Removing")
-    //     game.selectAll(".virus")
-    //         .data([virus])
-    //         .exit()
-    //         .remove();
-    // }
-    // toRemove.clear();
 
     for (let soldier of soldiersData) {
         let nearest = nearest_cell(soldier, virusData, c => !c.targeted && !c.dead);
