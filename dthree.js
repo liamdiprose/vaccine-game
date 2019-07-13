@@ -156,21 +156,21 @@ function frame() {
 
                 virus.x += norm_x * speed;
                 virus.y += norm_y * speed;
-        } else {
-            toRemove.add(virus);
+            } else {
+                virus.dead = true;
+            }
         }
-      }
     }
 
-    for (let virus of toRemove) {
-        virusData.splice(virusData.find(v => v === virus), 1);
-        console.log("Removing")
-        game.selectAll(".virus")
-            .data([virus])
-            .exit()
-            .remove();
-    }
-    toRemove.clear();
+    // for (let virus of toRemove) {
+    //     virusData.splice(virusData.find(v => v === virus), 1);
+    //     console.log("Removing")
+    //     game.selectAll(".virus")
+    //         .data([virus])
+    //         .exit()
+    //         .remove();
+    // }
+    // toRemove.clear();
 
     for (let soldier of soldiersData) {
         let nearest = nearest_cell(soldier, virusData, c => !c.targeted && !c.dead);
@@ -193,6 +193,8 @@ function frame() {
         .attr("href", d => {
             if (d.type === "normal" && d.infection >= 1) {
                 return "img/normal-infected.png";
+            } else if (d.dead) {
+                return "";
             } else {
                 return types[d.type].default_image;
             }
