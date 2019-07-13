@@ -396,13 +396,13 @@ function redraw() {
 
 function makeSoldier(game) {
 
-    if (toolbarSlots.length >= 6)
+    if (toolbarSlots.filter(d => d.dragged).length >= 6)
         return game.selectAll(".soldier");
 
     data = {};
 
     data.y = 316
-    data.x = toolbarSlots.length * 30 + 20;
+    data.x = toolbarSlots.filter(d => d.dragged).length * 30 + 20;
     data.type = "soldier";
     data.enabled = false;
     data.dragged = false;
@@ -422,8 +422,6 @@ function makeSoldier(game) {
 }
 
 function recalcToolbarXs() {
-
-    return;
 
     let i = 0;
     for (let slot of toolbarSlots) {
@@ -528,5 +526,6 @@ function main() {
     console.log(memories);
     soldierDrag(soldiers);
 }
+
 
 main();
