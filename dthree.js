@@ -61,8 +61,8 @@ let soldiersData = [
 ];
 
 let memoryData = [
-    { enabled: false, x: 150,  y: 316, type: "memory" },
-    { enabled: false, x: 190, y: 316, type: "memory" },
+    { enabled: false, x: 150,  y: 316, type: "memory", unique: 1 },
+    { enabled: false, x: 190, y: 316, type: "memory", unique: 2},
 ];
 
 // function addSoldier(game) {
@@ -153,6 +153,7 @@ function check_for_collision() {
         let closest_baddy = closest(memory, virusData);
         if (distance(memory, closest_baddy) < MEMORY_ACTIVATE_THRES) {
             // TODO: Activate Memory cell
+            console.log("A memory cell saw a baddy!");
         }
     }
 
@@ -221,8 +222,7 @@ function frame() {
             } else {
                 return types[d.type].default_image;
             }
-        })
-        ;
+        });
 
     check_for_collision();
     redraw();
@@ -278,6 +278,7 @@ function main() {
         .append("image")
         .attr("xlink:href", "img/memory-active.png")
         .attr("class", "memory")
+        .attr("id", d => d.unique)
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
