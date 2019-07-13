@@ -88,6 +88,13 @@ let types = {
         collision_radius: 10,
         default_image: "img/virus_tenticle.png",
     },
+    memory: {
+        width: 25,
+        height: 25,
+        collision_radius: 50,
+        default_image: "img/memory-inactive.png",
+        activated_image: "img/memory-active.png",
+    }
 };
 
 let normalCellData = (function () {
@@ -105,16 +112,21 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-    { enabled: false, x: 30,  y: 316, type: "soldier" },
-    { enabled: false, x: 60,  y: 316, type: "soldier" },
-    { enabled: false, x: 90,  y: 316, type: "soldier" },
-    { enabled: false, x: 120, y: 316, type: "soldier" },
+//    { enabled: false, x: 30,  y: 316, type: "soldier" },
+//    { enabled: false, x: 60,  y: 316, type: "soldier" },
+//    { enabled: false, x: 90,  y: 316, type: "soldier" },
+//    { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
 
-function addSoldier(game) {
-    game.selectAll(".soldier")
-      .data()
-}
+let memoryData = [
+    { enabled: false, activated: false, x: 150,  y: 316, type: "memory", id: 1 },
+    { enabled: false, activated: false, x: 190, y: 316, type: "memory", id: 2},
+];
+
+// function addSoldier(game) {
+//     game.selectAll(".soldier")
+//     ;.data()
+// }
 
 let virusData = [
     { x: 30, y: 60, type: "snake" },
@@ -122,13 +134,15 @@ let virusData = [
     { x: 90, y: 60, type: "tenticle" },
 ];
 
+let toolbarSlots = [];
+
 function magnitude(x, y) {
     return Math.sqrt(x * x + y * y);
 }
 
 function nearest_cell(self, cells, pred) {
 
-    let min_soldier
+    let min_soldier;
     let min_distance = 10000000000000;
     for (let cell of cells) {
         if (pred && !pred(cell)) continue;
@@ -174,6 +188,7 @@ function check_for_collision() {
 
 
     for (let soldier of soldiersData) {
+        if (!soldier.enabled) continue;
         for (let virus of virusData) {
             if (magnitude(virus.x - soldier.x, virus.y - soldier.y) < types[virus.type].collision_radius + types[soldier.type].collision_radius
                 && !virus.dead) {
@@ -181,6 +196,30 @@ function check_for_collision() {
             }
         }
     }
+    for (let memory of memoryData) {
+        if (!memory.enabled) continue;
+        for (let virus of virusData) {
+            if (magnitude(virus.x - memory.x, virus.y - memory.y) < types[virus.type].collision_radius + types[memory.type].collision_radius
+                && !virus.dead) {
+
+                if (!memory.activated) {
+                    memory.activated = true;
+
+
+                setTimeout(() => {
+                    makeSoldier(game, {
+                        type: "soldier",
+                        enabled: false
+                    }
+                    );
+
+                }, 40)
+                }
+
+            }
+        }
+    }
+
 }
 
 function frame() {
@@ -206,11 +245,15 @@ function frame() {
 
                 virus.x += norm_x * speed;
                 virus.y += norm_y * speed;
+            } else {
+                virus.dead = true;
             }
         }
     }
 
     for (let soldier of soldiersData) {
+        if (!soldier.enabled) continue;
+
         let nearest = nearest_cell(soldier, virusData, c => !c.targeted && !c.dead);
         if (nearest) {
             nearest.targeted = true;
@@ -225,23 +268,96 @@ function frame() {
         }
     }
 
-
     let allCells = game.selectAll("image") // offset after they move
         .attr("x", (d) => d.x - types[d.type].width / 2)
         .attr("y", (d) => d.y - types[d.type].height / 2)
         .attr("href", d => {
             if (d.type === "normal" && d.infection >= 1) {
                 return "img/normal-infected.png";
+            } else if (d.dead) {
+                return "";
+            } else if (d.type === "memory" && d.activated) {
+                return types[d.type].activated_image;
             } else {
                 return types[d.type].default_image;
             }
-        })
-        ;
+        });
 
     check_for_collision();
+    redraw();
 
     requestAnimationFrame(frame);
 }
+
+function redraw() {
+    game.select("#toolbar").raise();
+    game.selectAll(".soldier").raise();
+    game.selectAll(".memory").raise();
+}
+
+var soldierDrag = d3.drag()
+    .on("start", (d) => {
+            // TO DO: set enabled on max's array
+        // d.enabled = true;
+    })
+    .on("end", d => {
+            toolbarSlots.splice(toolbarSlots.find(e => e == d), 1);
+            recalcToolbarXs();
+            d.enabled = true})
+    .on("drag", function (d) {
+        if (d.enabled) return;
+        d3.select(this)
+            .attr("cx", d.x = d3.event.x)
+            .attr("cy", d.y = d3.event.y);
+    });
+
+function makeSoldier(game, data) {
+
+    console.log(`make solidler: ${data}`);
+
+    data = {} || data
+
+    data.y = 316
+    data.x = toolbarSlots.length * 50 + 100;
+    data.type = "soldier";
+    data.enabled = true;
+
+    toolbarSlots.push(data);
+    let newSoldier = game.selectAll(".soldier")
+        .data(toolbarSlots)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .transition()
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+
+    soldierDrag(newSoldier);
+}
+function recalcToolbarXs() {
+
+    let i = 0;
+    for (let slot of toolbarSlots) {
+        console.log(`recalc x for  ${slot}`);
+        slot.x = 50 * i + 30;
+        i++;
+    }
+    game.selectAll(".soldier")
+        .data(toolbarSlots)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .transition()
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+}
+
 
 function main() {
 
@@ -267,14 +383,25 @@ function main() {
         .attr("x", d => d.x - types[d.type].width / 2)
         .attr("y", d => d.y - types[d.type].height / 2);
 
-    game.select("#toolbar").raise()
 
-    let soldiers = game.selectAll(".soldier-option")
+    let soldiers = game.selectAll(".soldier")
         .data(soldiersData)
         .enter()
         .append("image")
         .attr("xlink:href", "img/soldier.png")
-        .attr("class", "soldier-option")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+
+    let memories = game.selectAll(".memory")
+        .data(memoryData)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/memory-active.png")
+        .attr("class", "memory")
+        .attr("id", d => d.id)
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
@@ -282,19 +409,27 @@ function main() {
 
     requestAnimationFrame(frame);
 
-    var soldierDrag = d3.drag()
-        .on("start", (d) => {
-            console.log(`Started d: ${d.x}`);
-        })
-        .on("drag", function (d) {
-            d3.select(this)
-                .attr("cx", d.x = d3.event.x)
-                .attr("cy", d.y = d3.event.y);
-        });
+//    var soldierDrag = d3.drag()
+//        .on("start", (d) => {
+//                // TO DO: set enabled on max's array
+//            // d.enabled = true;
+//        })
+//        .on("end", d => {
+//                toolbarSlots.splice(toolbarSlots.find(e => e == d), 1);
+//                recalcToolbarXs();
+//
+//                d.enabled = true})
+//        .on("drag", function (d) {
+//            if (d.type === "soldier" && d.enabled) return;
+//            if (d.type === "memory" && d.enabled) return;
+//            d3.select(this)
+//                .attr("cx", d.x = d3.event.x)
+//                .attr("cy", d.y = d3.event.y);
+//        });
 
-    soldierDrag(game.selectAll(".soldier-option"));
-
-    // dragHandler(viruses);
+    soldierDrag(memories);
+    soldierDrag(soldiers);
 }
 
+makeSoldier(game);
 main();
