@@ -6,6 +6,9 @@
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-drag.v1.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     
     <style>
@@ -19,14 +22,19 @@
             left: 10px;
             position: absolute;
         }
+
+        #toolbar {
+            background-color: lavender;
+        }
     </style>
 </head>
 <body>
-    <svg id=game>
-
-        <circle cx="100" cy="100" r="3"></circle>
-
-    </svg>
+    <div id=game>
+        <div class="virus">V</div>
+        <div id="toolbar">
+            <!-- TODO: MAX Make me Flexi -->
+            This is an element
+        </div>
     </div>
     <script src="dthree.js"></script>
     <script>
