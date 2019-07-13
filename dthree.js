@@ -48,11 +48,16 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-    { enabled: false, x: 30,  y: 330, type: "soldier" },
-    { enabled: false, x: 60,  y: 330, type: "soldier" },
-    { enabled: false, x: 90,  y: 330, type: "soldier" },
-    { enabled: false, x: 120, y: 330, type: "soldier" },
+    { enabled: false, x: 30,  y: 316, type: "soldier" },
+    { enabled: false, x: 60,  y: 316, type: "soldier" },
+    { enabled: false, x: 90,  y: 316, type: "soldier" },
+    { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
+
+function addSoldier(game) {
+    game.selectAll(".soldier")
+      .data()
+}
 
 let virusData = [
     { x: 30, y: 60, type: "snake" },
@@ -107,7 +112,6 @@ function frame() {
     }
 
     let allCells = game.selectAll("image") // offset after they move
-        //.transition()
         .attr("x", (d) => d.x - types[d.type].width / 2)
         .attr("y", (d) => d.y - types[d.type].height / 2)
         .attr("href", d => {
@@ -147,8 +151,7 @@ function main() {
         .attr("width", 30)
         .attr("height", 30)
         .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height / 2)
-        ;
+        .attr("y", d => d.y - types[d.type].height / 2);
 
     game.select("#toolbar").raise()
 
@@ -165,14 +168,17 @@ function main() {
 
     requestAnimationFrame(frame);
 
-    var dragHandler = d3.drag()
+    var soldierDrag = d3.drag()
+        .on("start", (d) => {
+            console.log(`Started d: ${d.x}`);
+        })
         .on("drag", function (d) {
             d3.select(this)
                 .attr("cx", d.x = d3.event.x)
                 .attr("cy", d.y = d3.event.y);
         });
 
-    dragHandler(game.selectAll(".soldier-option"));
+    soldierDrag(game.selectAll(".soldier-option"));
 
     // dragHandler(viruses);
 }
