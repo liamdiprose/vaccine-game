@@ -4,37 +4,37 @@ let types = {
     normal: {
         width: 30,
         height: 30,
-        collsion_radius: 15,
+        collision_radius: 15,
         default_image: "img/normal.png",
     },
     soldier: {
         width: 30,
         height: 30,
-        collsion_radius: 15,
+        collision_radius: 15,
         default_image: "img/soldier.png",
     },
     snake: {
         width: 30,
         height: 30,
-        collsion_radius: 15,
+        collision_radius: 15,
         default_image: "img/virus_snake.png",
     },
     cucumber: {
         width: 30,
         height: 30,
-        collsion_radius: 15,
+        collision_radius: 15,
         default_image: "img/virus_cucumber.png",
     },
     tenticle: {
         width: 30,
         height: 30,
-        collsion_radius: 15,
+        collision_radius: 15,
         default_image: "img/virus_tenticle.png",
     },
 };
 
 let normalCellData = (function () {
-    let num_cells = 10;
+    let num_cells = 100;
     let cells = [];
     for (let i = 0; i < num_cells; i++) {
         cells.push({
@@ -64,15 +64,16 @@ function magnitude(x, y) {
     return Math.sqrt(x * x + y * y);
 }
 
-function nearest_cell(self) {
+function nearest_cell(self, cells, pred) {
 
     let min_soldier
     let min_distance = 10000000000000;
-    for (let normal of normalCellData) {
-        let distance = magnitude(self.x - normal.x, self.y - normal.y);
+    for (let cell of cells) {
+        if (pred && !pred(cell)) continue;
+        let distance = magnitude(self.x - cell.x, self.y - cell.y);
         if (distance < min_distance) {
             min_distance = distance;
-            min_soldier = normal;
+            min_soldier = cell;
         }
     }
 
@@ -84,6 +85,27 @@ function check_for_collision() {
         for (let normalcell of normalCellData) {
             if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].collision_radius + types[normalcell.type].collision_radius) {
                 normalcell.infection += 0.01;
+                if (!normalcell.dead && normalcell.infection >= 1) {
+                    normalcell.dead = true;
+                    let new_virus = {
+                        x: normalcell.x,
+                        y: normalcell.y,
+                        type: virus.type,
+                    };
+                    virusData.push(new_virus);
+                    game
+                        .selectAll(".asdfasdf")
+                        .data([new_virus])
+                        .enter()
+                        .append("image")
+                        .attr("class", "virus")
+                        .attr("width", d => types[d.type].width)
+                        .attr("height", d => types[d.type].height)
+                        .attr("x", d => d.x - types[d.type].width / 2)
+                        .attr("y", d => d.y - types[d.type].height / 2)
+                        .attr("xlink:href", (d) => `img/virus_${d.type}.png`)
+                        ;
+                }
             }
         }
     }
@@ -91,16 +113,23 @@ function check_for_collision() {
 
 function frame() {
 
-    for (let virus of virusData) {
-        let nearest = nearest_cell(virus);
-        let dir_x = nearest.x - virus.x;
-        let dir_y = nearest.y - virus.y;
-        let norm_x = dir_x / magnitude(dir_x, dir_y);
-        let norm_y = dir_y / magnitude(dir_x, dir_y);
-        let speed = 0.1;
+    for (let cell of normalCellData) {
+        cell.targeted = false;
+    }
 
-        virus.x += norm_x * speed;
-        virus.y += norm_y * speed;
+    for (let virus of virusData) {
+        let nearest = nearest_cell(virus, normalCellData, c => c.infection < 1 && !c.targeted);
+        if (nearest) {
+            nearest.targeted = true;
+            let dir_x = nearest.x - virus.x;
+            let dir_y = nearest.y - virus.y;
+            let norm_x = dir_x / magnitude(dir_x, dir_y);
+            let norm_y = dir_y / magnitude(dir_x, dir_y);
+            let speed = 0.8;
+
+            virus.x += norm_x * speed;
+            virus.y += norm_y * speed;
+        }
     }
 
     let allCells = game.selectAll("image") // offset after they move
