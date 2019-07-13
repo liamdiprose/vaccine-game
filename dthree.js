@@ -121,7 +121,7 @@ var soldierDrag = d3.drag()
          .attr("cy", d.y = d3.event.y);
  });
 
-let num_cells = 40;
+let num_cells = 15;
 let normalCellData = (function () {
     let cells = [];
     for (let i = 0; i < num_cells; i++) {
@@ -283,7 +283,7 @@ function frame() {
                 let dir_y = nearest.y - virus.y;
                 let norm_x = dir_x / magnitude(dir_x, dir_y);
                 let norm_y = dir_y / magnitude(dir_x, dir_y);
-                let speed = 0.8;
+                let speed = 0.4;
 
                 virus.x += norm_x * speed;
                 virus.y += norm_y * speed;
