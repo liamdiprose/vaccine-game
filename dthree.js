@@ -183,6 +183,7 @@ function nearest_cell(self, cells, pred) {
 
 function check_for_collision() {
     for (let virus of virusData) {
+        if (virus.dead) continue;
         for (let normalcell of normalCellData) {
             if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].collision_radius + types[normalcell.type].collision_radius) {
                 normalcell.infection += 0.01;
@@ -216,6 +217,7 @@ function check_for_collision() {
     for (let soldier of soldiersData) {
         if (!soldier.enabled) continue;
         for (let virus of virusData) {
+            if (virus.dead) continue;
             if (magnitude(virus.x - soldier.x, virus.y - soldier.y) < types[virus.type].collision_radius + types[soldier.type].collision_radius
                 && !virus.dead) {
                 virus.dead = true;
