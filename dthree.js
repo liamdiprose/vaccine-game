@@ -10,7 +10,7 @@ let types = {
     soldier: {
         width: 30,
         height: 30,
-        collision_radius: 15,
+        collision_radius: 5,
         default_image: "img/soldier.png",
     },
     snake: {
@@ -28,7 +28,7 @@ let types = {
     tenticle: {
         width: 30,
         height: 30,
-        collision_radius: 15,
+        collision_radius: 10,
         default_image: "img/virus_tenticle.png",
     },
     memory: {
@@ -40,7 +40,7 @@ let types = {
 };
 
 let normalCellData = (function () {
-    let num_cells = 100;
+    let num_cells = 15;
     let cells = [];
     for (let i = 0; i < num_cells; i++) {
         cells.push({
@@ -120,6 +120,16 @@ function check_for_collision() {
             }
         }
     }
+
+
+    for (let soldier of soldiersData) {
+        for (let virus of virusData) {
+            if (magnitude(virus.x - soldier.x, virus.y - soldier.y) < types[virus.type].collision_radius + types[soldier.type].collision_radius
+                && !virus.dead) {
+                virus.dead = true;
+            }
+        }
+    }
 }
 
 function frame() {
@@ -129,21 +139,27 @@ function frame() {
     }
 
     let toRemove = new Set();
-    for (let virus of virusData) {
-        let nearest = nearest_cell(virus, normalCellData, c => c.infection < 1 && !c.targeted);
-        if (nearest) {
-            nearest.targeted = true;
-            let dir_x = nearest.x - virus.x;
-            let dir_y = nearest.y - virus.y;
-            let norm_x = dir_x / magnitude(dir_x, dir_y);
-            let norm_y = dir_y / magnitude(dir_x, dir_y);
-            let speed = 0.8;
+    for (let v of virusData) {
+        v.targeted = false;
+    }
 
-            virus.x += norm_x * speed;
-            virus.y += norm_y * speed;
+    for (let virus of virusData) {
+        if (!virus.dead) {
+            let nearest = nearest_cell(virus, normalCellData, c => c.infection < 1 && !c.targeted);
+            if (nearest) {
+                nearest.targeted = true;
+                let dir_x = nearest.x - virus.x;
+                let dir_y = nearest.y - virus.y;
+                let norm_x = dir_x / magnitude(dir_x, dir_y);
+                let norm_y = dir_y / magnitude(dir_x, dir_y);
+                let speed = 0.8;
+
+                virus.x += norm_x * speed;
+                virus.y += norm_y * speed;
         } else {
             toRemove.add(virus);
         }
+      }
     }
 
     for (let virus of toRemove) {
@@ -155,6 +171,21 @@ function frame() {
             .remove();
     }
     toRemove.clear();
+
+    for (let soldier of soldiersData) {
+        let nearest = nearest_cell(soldier, virusData, c => !c.targeted && !c.dead);
+        if (nearest) {
+            nearest.targeted = true;
+            let dir_x = nearest.x - soldier.x;
+            let dir_y = nearest.y - soldier.y;
+            let norm_x = dir_x / magnitude(dir_x, dir_y);
+            let norm_y = dir_y / magnitude(dir_x, dir_y);
+            let speed = 0.5;
+
+            soldier.x += norm_x * speed;
+            soldier.y += norm_y * speed;
+        }
+    }
 
     let allCells = game.selectAll("image") // offset after they move
         .attr("x", (d) => d.x - types[d.type].width / 2)
