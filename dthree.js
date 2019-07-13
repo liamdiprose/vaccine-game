@@ -1,5 +1,62 @@
 let game = d3.select("#game")
 
+let body_parts = [
+    {
+        name: "Head",
+        value: 0,
+        stages: [
+            {
+                name: "Fine",
+                image: "img/person-head-normal.png",
+            },
+            {
+                name: "Not Feeling Great",
+                image: "img/person-head-mild.png",
+            },
+            {
+                name: "Severe Nausea",
+                image: "img/person-head-severe.png",
+            }
+        ]
+    },
+    {
+        name: "Torso",
+        value: 0,
+        stages: [
+            {
+                name: "Normal",
+                image: "img/person-torso-normal.png",
+            },
+            {
+                name: "Mild Rash",
+                image: "img/person-torso-mild.png",
+            },
+            {
+                name: "Severe Rash",
+                image: "img/person-torso-severe.png",
+            }
+        ]
+    },
+    {
+        name: "Legs",
+        value: 0,
+        stages: [
+            {
+                name: "Legs",
+                image: "img/person-legs-normal.png",
+            },
+            {
+                name: "Cold Legs",
+                image: "img/person-legs-mild.png",
+            },
+            {
+                name: "Really Cold Legs",
+                image: "img/person-legs-severe.png",
+            }
+        ]
+    },
+];
+
 let types = {
     normal: {
         width: 30,
@@ -64,8 +121,8 @@ var soldierDrag = d3.drag()
          .attr("cy", d.y = d3.event.y);
  });
 
+let num_cells = 15;
 let normalCellData = (function () {
-    let num_cells = 15;
     let cells = [];
     for (let i = 0; i < num_cells; i++) {
         cells.push({
@@ -129,6 +186,7 @@ function check_for_collision() {
         for (let normalcell of normalCellData) {
             if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].collision_radius + types[normalcell.type].collision_radius) {
                 normalcell.infection += 0.01;
+                normalcell.infection_type = virus.type;
                 if (!normalcell.dead && normalcell.infection >= 1) {
                     normalcell.dead = true;
                     let new_virus = {
@@ -268,6 +326,39 @@ function frame() {
         });
 
     check_for_collision();
+
+    // calculate health and sickness stages
+    let stats = {
+        infected: 0,
+        virus1: 0,
+        virus2: 0,
+        virus3: 0,
+    };
+    for (let cell of normalCellData) {
+        if (cell.infection >= 1) {
+            stats.infected += 1;
+            if (cell.infection_type == "snake") {
+                stats.virus1 += 1;
+            } else if (cell.infection_type == "cucumber") {
+                stats.virus2 += 1;
+            } else if (cell.infection_type == "tenticle") {
+                stats.virus3 += 1;
+            }
+        }
+    }
+    body_parts[0].stage = Math.min(2, Math.floor(stats.virus1 / (num_cells / 6)));
+    body_parts[1].stage = Math.min(2, Math.floor(stats.virus2 / (num_cells / 6)));
+    body_parts[2].stage = Math.min(2, Math.floor(stats.virus3 / (num_cells / 6)));
+
+    d3
+        .selectAll(".body-image")
+        .attr("src", d => d.stages[d.stage].image)
+        ;
+    d3
+        .selectAll(".body-text")
+        .text(d => d.stages[d.stage].name)
+        ;
+
     redraw();
 
     requestAnimationFrame(frame);
@@ -339,6 +430,38 @@ function recalcToolbarXs() {
 
 
 function main() {
+
+
+    let divs = d3
+        .select("#person-panel")
+        .selectAll(".body-part")
+        .data(body_parts)
+        .enter()
+        .append("div")
+        .attr("class", "body-part")
+        ;
+    divs
+        .append("img")
+        .attr("class", "body-image")
+        .attr("src", d => d.stages[2].image)
+        .style("width", "auto")
+        .style("height", "21vh")
+        ;
+    divs
+        .append("div")
+        .attr("class", "body-text")
+        .text(d => d.stages[2].name)
+        .style("color", "white")
+        .style("text-align", "center")
+        ;
+
+    // d3
+    //     .select("#person-panel")
+    //     //.select(".body-part")
+    //     .selectAll(".asdf")
+    //     .data(body_parts)
+    //     .enter()
+    //     ;
 
     let viruses = game.selectAll(".virus")
         .data(virusData)
