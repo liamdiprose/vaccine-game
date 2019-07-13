@@ -152,7 +152,7 @@ function main() {
         .attr("y", d => d.y - types[d.type].height / 2)
         ;
 
-    let normalCells = game.selectAll(".askjdfhkajs")
+    let normalCells = game.selectAll(".normal-cell")
         .data(normalCellData)
         .enter()
         .append("image")
@@ -163,7 +163,7 @@ function main() {
         .attr("y", d => d.y - types[d.type].height / 2)
         ;
 
-    game.selectAll(".asdasd")
+    game.selectAll(".rectangles")
         .data([{}])
         .enter()
         .append("rect")
@@ -173,14 +173,13 @@ function main() {
         .attr('height', 30)
         .attr('fill', 'pink');
 
-
     requestAnimationFrame(frame);
 
     var dragHandler = d3.drag()
         .on("drag", function (d) {
             d3.select(this)
-                .style("left", d.x = (d3.event.x - d.width / 2) + 'px')
-                .style("top", d.y = (d3.event.y - d.width / 2) + 'px');
+                .attr("cx", d.x = d3.event.x)
+                .attr("cy", d.y = d3.event.y);
         });
 
     dragHandler(game.selectAll(".soldier-option"));
