@@ -6,6 +6,7 @@
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     
     <style>
         #game {
@@ -21,24 +22,13 @@
     </style>
 </head>
 <body>
-    <div id=game>
-        <div class=virus>
-            V
-        </div>
-        <div class=virus>
-            V
-        </div>
-        <div class=virus>
-            V
-        </div>
-        <div class=virus>
-            V
-        </div>
-        <div class=virus>
-            V
-        </div>
+    <svg id=game>
+
+        <circle cx="100" cy="100" r="3"></circle>
+
+    </svg>
     </div>
-    <script src="main.js"></script>
+    <script src="dthree.js"></script>
     <script>
         //setInterval(() => location.reload(), 1000);
     </script>
