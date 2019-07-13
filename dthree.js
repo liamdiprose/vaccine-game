@@ -48,11 +48,16 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-    { enabled: false, x: 30, y: 200, type: "soldier" },
-    { enabled: false, x: 60, y: 200, type: "soldier" },
-    { enabled: false, x: 90, y: 200, type: "soldier" },
-    { enabled: false, x: 120, y: 200, type: "soldier" },
+    { enabled: false, x: 30,  y: 316, type: "soldier" },
+    { enabled: false, x: 60,  y: 316, type: "soldier" },
+    { enabled: false, x: 90,  y: 316, type: "soldier" },
+    { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
+
+function addSoldier(game) {
+    game.selectAll(".soldier")
+      .data()
+}
 
 let virusData = [
     { x: 30, y: 60, type: "snake" },
@@ -195,6 +200,18 @@ function main() {
         .attr("xlink:href", (d) => `img/virus_${d.type}.png`)
         ;
 
+    let normalCells = game.selectAll(".normal-cell")
+        .data(normalCellData)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/normal.png")
+        .attr("width", 30)
+        .attr("height", 30)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height / 2);
+
+    game.select("#toolbar").raise()
+
     let soldiers = game.selectAll(".soldier-option")
         .data(soldiersData)
         .enter()
@@ -204,41 +221,23 @@ function main() {
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height / 2)
-        ;
-
-    let normalCells = game.selectAll(".normal-cell")
-        .data(normalCellData)
-        .enter()
-        .append("image")
-        .attr("xlink:href", "img/normal.png")
-        .attr("width", 30)
-        .attr("height", 30)
-        .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height / 2)
-        ;
-
-    game.selectAll(".rectangles")
-        .data([{}])
-        .enter()
-        .append("rect")
-        .attr('y', 300)
-        .attr('x', 0)
-        .attr('width', 300)
-        .attr('height', 30)
-        .attr('fill', 'pink')
-        ;
+        .attr("y", d => d.y - types[d.type].height /2 );
 
     requestAnimationFrame(frame);
 
-    var dragHandler = d3.drag()
+    var soldierDrag = d3.drag()
+        .on("start", (d) => {
+            console.log(`Started d: ${d.x}`);
+        })
         .on("drag", function (d) {
             d3.select(this)
                 .attr("cx", d.x = d3.event.x)
                 .attr("cy", d.y = d3.event.y);
         });
 
-    dragHandler(game.selectAll(".soldier-option"));
+    soldierDrag(game.selectAll(".soldier-option"));
+
+    // dragHandler(viruses);
 }
 
 main();
