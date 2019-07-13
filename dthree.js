@@ -31,6 +31,12 @@ let types = {
         collision_radius: 15,
         default_image: "img/virus_tenticle.png",
     },
+    memory: {
+        width: 25,
+        height: 25,
+        collision_radius: 15,
+        default_image: "img/memory-inactive.png",
+    }
 };
 
 let normalCellData = (function () {
@@ -122,6 +128,7 @@ function frame() {
         cell.targeted = false;
     }
 
+    let toRemove = new Set();
     for (let virus of virusData) {
         let nearest = nearest_cell(virus, normalCellData, c => c.infection < 1 && !c.targeted);
         if (nearest) {
@@ -134,8 +141,20 @@ function frame() {
 
             virus.x += norm_x * speed;
             virus.y += norm_y * speed;
+        } else {
+            toRemove.add(virus);
         }
     }
+
+    for (let virus of toRemove) {
+        virusData.splice(virusData.find(v => v === virus), 1);
+        console.log("Removing")
+        game.selectAll(".virus")
+            .data([virus])
+            .exit()
+            .remove();
+    }
+    toRemove.clear();
 
     let allCells = game.selectAll("image") // offset after they move
         .attr("x", (d) => d.x - types[d.type].width / 2)
@@ -150,8 +169,15 @@ function frame() {
         ;
 
     check_for_collision();
+    redraw();
 
     requestAnimationFrame(frame);
+}
+
+function redraw() {
+    game.select("#toolbar").raise()
+    game.selectAll(".soldier").raise()
+    game.selectAll(".memory").raise()
 }
 
 function main() {
@@ -178,14 +204,24 @@ function main() {
         .attr("x", d => d.x - types[d.type].width / 2)
         .attr("y", d => d.y - types[d.type].height / 2);
 
-    game.select("#toolbar").raise()
 
-    let soldiers = game.selectAll(".soldier-option")
+    let soldiers = game.selectAll(".soldier")
         .data(soldiersData)
         .enter()
         .append("image")
         .attr("xlink:href", "img/soldier.png")
-        .attr("class", "soldier-option")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+
+    let memories = game.selectAll(".memory")
+        .data([{x: 153, y: 314, type: "memory"}])
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/memory-active.png")
+        .attr("class", "memory")
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
@@ -203,9 +239,8 @@ function main() {
                 .attr("cy", d.y = d3.event.y);
         });
 
-    soldierDrag(game.selectAll(".soldier-option"));
-
-    // dragHandler(viruses);
+    soldierDrag(memories);
+    soldierDrag(soldiers);
 }
 
 main();
