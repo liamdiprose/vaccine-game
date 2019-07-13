@@ -338,7 +338,7 @@ function frame() {
 
     d3
         .select("#healthbar div")
-        .text(health + "%")
+        .text(health + " %")
         ;
 
     d3
