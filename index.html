@@ -53,8 +53,8 @@
         #game {
             position: relative;
             width: 80vh;
-            height: 80vh;
-            background-color: lightgray;
+            height: calc(80vh * 1.1);
+            background-color: lavender;
         }
 
         #toolbar {
@@ -64,7 +64,7 @@
 
         #person-panel {
             width: 30vw;
-            height: calc(80vh + 4em);
+            height: calc(80vh * 1.1);
             background-color: lightgray;
         }
 
@@ -94,17 +94,10 @@
         VIRUS GAME: GIVE ME A NAME
     </header>
     <main>
-        <div id=game-panel>
-            <div id=game>
-                <!-- D3 will add stuff here -->
-            </div>
-            <div id="toolbar">
-                <!-- <img class="soldier-option" src="img/soldier.png" width="50px">
-                <img class="soldier-option" src="img/soldier.png" width="50px">
-                <img class="soldier-option" src="img/soldier.png" width="50px">
-                <img class="soldier-option" src="img/soldier.png" width="50px"> -->
-            </div>
-        </div>
+        <svg id=game viewBox="0 0 300 330">
+            <!-- D3 will add stuff here -->
+            
+        </svg>
         <div id=person-panel>
             <div id="healthbar">
                 <div>

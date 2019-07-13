@@ -1,91 +1,180 @@
-
 let game = d3.select("#game")
 
-
-   
-
-function frame() {
-
-
-    let circles = game.selectAll(".virus")
-        //.enter()
-        //.append("circle")
-        .transition()
-        .style("top", (d) => '' + d.y + 'px')
-        .style("left", (d) => '' + d.x + 'px')
-        //.attr("r", () => 10);
-
-    requestAnimationFrame(frame);
+let types = {
+    normal: {
+        width: 30,
+        height: 30,
+        collsion_radius: 15,
+    },
+    soldier: {
+        width: 30,
+        height: 30,
+        collsion_radius: 15,
+    },
+    snake: {
+        width: 30,
+        height: 30,
+        collsion_radius: 15,
+    },
+    cucumber: {
+        width: 30,
+        height: 30,
+        collsion_radius: 15,
+    },
+    tenticle: {
+        width: 30,
+        height: 30,
+        collsion_radius: 15,
+    },
 }
 
-function randomVirus() {
-    var ran = Math.floor(Math.random() * 3);
-
-    switch (ran) {
-        case 0:
-            return "snake";
-        case 1:
-            return "cucumber";
-        case 2:
-            return "tenticle";
+let normalCellData = (function () {
+    let num_cells = 10;
+    let cells = [];
+    for (let i = 0; i < num_cells; i++) {
+        cells.push({
+            type: "normal",
+            infected: false,
+            x: Math.floor(Math.random() * 300),
+            y: Math.floor(Math.random() * 300),
+        });
     }
-}
+    return cells;
+})();
+
+let soldiersData = [
+    { enabled: false, x: 30, y: 200, type: "soldier" },
+    { enabled: false, x: 60, y: 200, type: "soldier" },
+    { enabled: false, x: 90, y: 200, type: "soldier" },
+    { enabled: false, x: 120, y: 200, type: "soldier" },
+];
 
 let virusData = [
     { x: 30, y: 60, type: "snake" },
-    { x: 30, y: 60, type: "cucumber" },
-    { x: 30, y: 60, type: "tenticle" },
-    { x: 30, y: 60, type: "snake" },
+    { x: 60, y: 60, type: "cucumber" },
+    { x: 90, y: 60, type: "tenticle" },
 ];
 
-let soldiersData = [
-    { enabled: false, x: 30, y: 320 },
-    { enabled: false, x: 30, y: 320 },
-    { enabled: false, x: 30, y: 320 },
-    { enabled: false, x: 30, y: 320 },
-]
+function magnitude(x, y) {
+    return Math.sqrt(x*x + y*y);
+}
+
+function nearest_cell(self) {
+
+    let min_soldier
+    let min_distance = 10000000000000;
+    for (let normal of normalCellData) {
+        let distance = magnitude(self.x - normal.x, self.y - normal.y);
+        if (distance < min_distance) {
+            min_distance = distance;
+            min_soldier = normal;
+        }
+    }
+
+    return min_soldier;
+}
+
+function check_for_collision(){
+    for (let virus of virusData){
+        for (let normalcell of normalCellData){
+            //console.log("penis")
+            //console.log(magnitude(virus.x - normalcell.x, virus.y - normalcell.y))
+            if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].radius + types[normalcell.type].radius) {
+                console.log("COLLISION");
+            }   
+        }
+    }
+}
+
+function frame() {
+
+    for (let virus of virusData) {
+        //virus.x += Math.random() * 2 - 1;
+        //virus.y += Math.random() * 2 - 1;
+    
+        let nearest = nearest_cell(virus);
+        let dir_x = nearest.x - virus.x;
+        let dir_y = nearest.y - virus.y;
+        let norm_x = dir_x / magnitude(dir_x, dir_y);
+        let norm_y = dir_y / magnitude(dir_x, dir_y);
+        let speed = 0.1;
+
+        virus.x += norm_x * speed;
+        virus.y += norm_y * speed;
+    
+    }
+
+    let allCells = game.selectAll("image") // offset after they move
+        //.transition()
+        .attr("x", (d) => d.x - types[d.type].width / 2 )
+        .attr("y", (d) => d.y - types[d.type].height / 2)
+    ;
+
+    check_for_collision();
+    
+
+
+    requestAnimationFrame(frame);
+}
 
 function main() {
-    requestAnimationFrame(frame);
 
     let viruses = game.selectAll(".virus")
         .data(virusData)
         .enter()
-        .append("img");
+        .append("image")
+        .attr("class", "virus")
+        .attr("width", 30)
+        .attr("height", 30)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height / 2)
+        .attr("xlink:href", (d) => `img/virus_${d.type}.png`)
+    ;
 
-    viruses.attr("src", (d) => `img/virus_${d.type}.png`)
-           .attr("class", (d) => `virus virus-${d.type}`);
+    let soldiers = game.selectAll(".soldier-option")
+        .data(soldiersData)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier-option")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 )
+    ;
 
+    let normalCells = game.selectAll(".askjdfhkajs")
+        .data(normalCellData)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/normal.png")
+        .attr("width", 30)
+        .attr("height", 30)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height / 2)
+    ;
+
+    game.selectAll(".asdasd")
+    .data([{}])
+    .enter()
+    .append("rect")
+    .attr('y', 300)
+    .attr('x', 0)
+    .attr('width', 300)
+    .attr('height', 30)
+    .attr('fill', 'pink');
+
+
+    requestAnimationFrame(frame);
 
     var dragHandler = d3.drag()
         .on("drag", function (d) {
             d3.select(this)
-                .style("left", d.x = d3.event.x +'px')
-                .style("top", d.y = d3.event.y + 'px');
+                .style("left", d.x = (d3.event.x - d.width / 2) +'px')
+                .style("top", d.y = (d3.event.y - d.width / 2) + 'px');
         });
 
-    let soldierOptions = game.selectAll(".soldier-option")
-        .data(soldiersData)
-        .enter()
-        .append("img")
-        .attr("src", "img/soldier.png")
-        .attr("class", "soldier-option")
-        .style("width", "30px")
-        .style("left", (d) => d.x + 'px')
-        .style("top", (d) => d.y + 'px')
-        .style("width", "30px");
-
     dragHandler(game.selectAll(".soldier-option"));
-    
-
-    setTimeout(() => {
-        virusData[1].x = 300;
-        virusData[1].y = 300;
-    }, 1030);
-    setTimeout(() => {
-        virusData[1].x = 0;
-        virusData[1].y = 0;
-    }, 3000);
 
     // dragHandler(viruses);
 }
