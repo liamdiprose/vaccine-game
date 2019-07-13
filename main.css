@@ -1,4 +1,24 @@
+.virus {
+    left: 10px;
+    position: absolute;
+}
 
-.virus.first {
+.virus.virus-snake {
     width: 100px;
+}
+
+.virus.virus-cucumber {
+    width: 100px;
+}
+
+.virus.virus-tenticle {
+    width: 100px;
+}
+
+#toolbar {
+    position: relative;
+}
+
+.soldier-option {
+    position: absolute;
 }

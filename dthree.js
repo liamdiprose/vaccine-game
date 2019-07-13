@@ -1,11 +1,6 @@
 
 let game = d3.select("#game")
 
-let virusData = [
-    { x: 3, y: 3, r: 4 },
-    { x: 3, y: 3, r: 4 },
-    { x: 3, y: 3, r: 4 }
-];
 
    
 
@@ -13,12 +8,11 @@ function frame() {
 
 
     let circles = game.selectAll(".virus")
-        .data(["red", "blue", "orange"])
         //.enter()
         //.append("circle")
         .transition()
-        .style("top", () => '' + Math.random() * 400 + 'px')
-        .style("left", () => '' + Math.random() * 400 + 'px')
+        .style("top", (d) => '' + d.y + 'px')
+        .style("left", (d) => '' + d.x + 'px')
         //.attr("r", () => 10);
 
     requestAnimationFrame(frame);
@@ -29,13 +23,20 @@ function randomVirus() {
 
     switch (ran) {
         case 0:
-            return "img/virus1.png";
+            return "snake";
         case 1:
-            return "img/virus2.png";
+            return "cucumber";
         case 2:
-            return "img/virus3.png";
+            return "tenticle";
     }
 }
+
+let virusData = [
+    { x: 30, y: 60, type: "snake" },
+    { x: 30, y: 60, type: "cucumber" },
+    { x: 30, y: 60, type: "tenticle" },
+    { x: 30, y: 60, type: "snake" },
+];
 
 function main() {
     requestAnimationFrame(frame);
@@ -45,18 +46,32 @@ function main() {
         .enter()
         .append("img");
 
-    viruses.attr("src", randomVirus)
-           .attr("class", "virus");
+    viruses.attr("src", (d) => `img/virus_${d.type}.png`)
+           .attr("class", (d) => `virus virus-${d.type}`);
 
 
     var dragHandler = d3.drag()
         .on("drag", function () {
             d3.select(this)
-                .attr("left", d3.event.x)
-                .attr("top", d3.event.y);
+                .style("left", '' + d3.event.x +'px')
+                .style("top", '' + d3.event.y + 'px');
         });
 
-    dragHandler(viruses);
+    soliderOptions = d3.selectAll(".soldier-option");
+
+    dragHandler(soliderOptions);
+    
+
+    setTimeout(() => {
+        virusData[1].x = 300;
+        virusData[1].y = 300;
+    }, 1030);
+    setTimeout(() => {
+        virusData[1].x = 0;
+        virusData[1].y = 0;
+    }, 3000);
+
+    // dragHandler(viruses);
 }
 
 main();
