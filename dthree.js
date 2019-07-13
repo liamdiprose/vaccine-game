@@ -5,26 +5,31 @@ let types = {
         width: 30,
         height: 30,
         collsion_radius: 15,
+        default_image: "img/normal.png",
     },
     soldier: {
         width: 30,
         height: 30,
         collsion_radius: 15,
+        default_image: "img/soldier.png",
     },
     snake: {
         width: 30,
         height: 30,
         collsion_radius: 15,
+        default_image: "img/virus_snake.png",
     },
     cucumber: {
         width: 30,
         height: 30,
         collsion_radius: 15,
+        default_image: "img/virus_cucumber.png",
     },
     tenticle: {
         width: 30,
         height: 30,
         collsion_radius: 15,
+        default_image: "img/virus_tenticle.png",
     },
 }
 
@@ -34,7 +39,7 @@ let normalCellData = (function () {
     for (let i = 0; i < num_cells; i++) {
         cells.push({
             type: "normal",
-            infected: false,
+            infection: 0,
             x: Math.floor(Math.random() * 300),
             y: Math.floor(Math.random() * 300),
         });
@@ -56,7 +61,7 @@ let virusData = [
 ];
 
 function magnitude(x, y) {
-    return Math.sqrt(x*x + y*y);
+    return Math.sqrt(x * x + y * y);
 }
 
 function nearest_cell(self) {
@@ -74,14 +79,12 @@ function nearest_cell(self) {
     return min_soldier;
 }
 
-function check_for_collision(){
-    for (let virus of virusData){
-        for (let normalcell of normalCellData){
-            //console.log("penis")
-            //console.log(magnitude(virus.x - normalcell.x, virus.y - normalcell.y))
-            if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].radius + types[normalcell.type].radius) {
-                console.log("COLLISION");
-            }   
+function check_for_collision() {
+    for (let virus of virusData) {
+        for (let normalcell of normalCellData) {
+            if (magnitude(virus.x - normalcell.x, virus.y - normalcell.y) < types[virus.type].collision_radius + types[normalcell.type].collision_radius) {
+                normalcell.infection += 0.01;
+            }
         }
     }
 }
@@ -91,7 +94,7 @@ function frame() {
     for (let virus of virusData) {
         //virus.x += Math.random() * 2 - 1;
         //virus.y += Math.random() * 2 - 1;
-    
+
         let nearest = nearest_cell(virus);
         let dir_x = nearest.x - virus.x;
         let dir_y = nearest.y - virus.y;
@@ -104,11 +107,20 @@ function frame() {
     }
 
     let allCells = game.selectAll("image") // offset after they move
-        .attr("x", (d) => d.x - types[d.type].width)
-        .attr("y", (d) => d.y - types[d.type].width)
+        //.transition()
+        .attr("x", (d) => d.x - types[d.type].width / 2)
+        .attr("y", (d) => d.y - types[d.type].height / 2)
+        .attr("href", d => {
+            if (d.type === "normal" && d.infection >= 1) {
+                return "img/normal-infected.png";
+            } else {
+                return types[d.type].default_image;
+            }
+        })
+        ;
 
     check_for_collision();
-    
+
 
     requestAnimationFrame(frame);
 }
@@ -125,8 +137,7 @@ function main() {
         .attr("x", d => d.x - types[d.type].width / 2)
         .attr("y", d => d.y - types[d.type].height / 2)
         .attr("xlink:href", (d) => `img/virus_${d.type}.png`)
-    ;
-
+        ;
 
     let normalCells = game.selectAll(".normal-cell")
         .data(normalCellData)
@@ -137,7 +148,7 @@ function main() {
         .attr("height", 30)
         .attr("x", d => d.x - types[d.type].width / 2)
         .attr("y", d => d.y - types[d.type].height / 2)
-    ;
+        ;
 
     game.select("#toolbar").raise()
 
