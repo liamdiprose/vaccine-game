@@ -55,10 +55,10 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-    { enabled: false, x: 30,  y: 316, type: "soldier" },
-    { enabled: false, x: 60,  y: 316, type: "soldier" },
-    { enabled: false, x: 90,  y: 316, type: "soldier" },
-    { enabled: false, x: 120, y: 316, type: "soldier" },
+//    { enabled: false, x: 30,  y: 316, type: "soldier" },
+//    { enabled: false, x: 60,  y: 316, type: "soldier" },
+//    { enabled: false, x: 90,  y: 316, type: "soldier" },
+//    { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
 
 let memoryData = [
@@ -76,6 +76,8 @@ let virusData = [
     { x: 60, y: 60, type: "cucumber" },
     { x: 90, y: 60, type: "tenticle" },
 ];
+
+let toolbarSlots = [];
 
 function magnitude(x, y) {
     return Math.sqrt(x * x + y * y);
@@ -142,7 +144,20 @@ function check_for_collision() {
         for (let virus of virusData) {
             if (magnitude(virus.x - memory.x, virus.y - memory.y) < types[virus.type].collision_radius + types[memory.type].collision_radius
                 && !virus.dead) {
-                memory.activated = true;
+
+                if (!memory.activated) {
+                    memory.activated = true;
+
+
+                setTimeout(() => {
+                    makeSoldier(game, {
+                        type: "soldier",
+                        enabled: false
+                    }
+                    );
+
+                }, 40)
+                }
 
             }
         }
@@ -223,6 +238,70 @@ function redraw() {
     game.selectAll(".memory").raise();
 }
 
+var soldierDrag = d3.drag()
+    .on("start", (d) => {
+            // TO DO: set enabled on max's array
+        // d.enabled = true;
+    })
+    .on("end", d => {
+            toolbarSlots.splice(toolbarSlots.find(e => e == d), 1);
+            recalcToolbarXs();
+            d.enabled = true})
+    .on("drag", function (d) {
+        if (d.enabled) return;
+        d3.select(this)
+            .attr("cx", d.x = d3.event.x)
+            .attr("cy", d.y = d3.event.y);
+    });
+
+function makeSoldier(game, data) {
+
+    console.log(`make solidler: ${data}`);
+
+    data = {} || data
+
+    data.y = 316
+    data.x = toolbarSlots.length * 50 + 100;
+    data.type = "soldier";
+    data.enabled = true;
+
+    toolbarSlots.push(data);
+    let newSoldier = game.selectAll(".soldier")
+        .data(toolbarSlots)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .transition()
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+
+    soldierDrag(newSoldier);
+}
+function recalcToolbarXs() {
+
+    let i = 0;
+    for (let slot of toolbarSlots) {
+        console.log(`recalc x for  ${slot}`);
+        slot.x = 50 * i + 30;
+        i++;
+    }
+    game.selectAll(".soldier")
+        .data(toolbarSlots)
+        .enter()
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .transition()
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
+}
+
+
 function main() {
 
     let viruses = game.selectAll(".virus")
@@ -273,22 +352,27 @@ function main() {
 
     requestAnimationFrame(frame);
 
-    var soldierDrag = d3.drag()
-        .on("start", (d) => {
-                // TO DO: set enabled on max's array
-            // d.enabled = true;
-        })
-        .on("end", d => {d.enabled = true})
-        .on("drag", function (d) {
-            if (d.type === "soldier" && d.enabled) return;
-            if (d.type === "memory" && d.enabled) return;
-            d3.select(this)
-                .attr("cx", d.x = d3.event.x)
-                .attr("cy", d.y = d3.event.y);
-        });
+//    var soldierDrag = d3.drag()
+//        .on("start", (d) => {
+//                // TO DO: set enabled on max's array
+//            // d.enabled = true;
+//        })
+//        .on("end", d => {
+//                toolbarSlots.splice(toolbarSlots.find(e => e == d), 1);
+//                recalcToolbarXs();
+//
+//                d.enabled = true})
+//        .on("drag", function (d) {
+//            if (d.type === "soldier" && d.enabled) return;
+//            if (d.type === "memory" && d.enabled) return;
+//            d3.select(this)
+//                .attr("cx", d.x = d3.event.x)
+//                .attr("cy", d.y = d3.event.y);
+//        });
 
     soldierDrag(memories);
     soldierDrag(soldiers);
 }
 
+makeSoldier(game);
 main();
