@@ -16,6 +16,7 @@
 }
 
 #toolbar {
+    fill: pink;
     position: relative;
     z-index: -10;
 }

@@ -43,10 +43,10 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-    { enabled: false, x: 30, y: 200, type: "soldier" },
-    { enabled: false, x: 60, y: 200, type: "soldier" },
-    { enabled: false, x: 90, y: 200, type: "soldier" },
-    { enabled: false, x: 120, y: 200, type: "soldier" },
+    { enabled: false, x: 30,  y: 330, type: "soldier" },
+    { enabled: false, x: 60,  y: 330, type: "soldier" },
+    { enabled: false, x: 90,  y: 330, type: "soldier" },
+    { enabled: false, x: 120, y: 330, type: "soldier" },
 ];
 
 let virusData = [
@@ -101,18 +101,14 @@ function frame() {
 
         virus.x += norm_x * speed;
         virus.y += norm_y * speed;
-    
     }
 
     let allCells = game.selectAll("image") // offset after they move
-        //.transition()
-        .attr("x", (d) => d.x - types[d.type].width / 2 )
-        .attr("y", (d) => d.y - types[d.type].height / 2)
-    ;
+        .attr("x", (d) => d.x - types[d.type].width)
+        .attr("y", (d) => d.y - types[d.type].width)
 
     check_for_collision();
     
-
 
     requestAnimationFrame(frame);
 }
@@ -131,16 +127,6 @@ function main() {
         .attr("xlink:href", (d) => `img/virus_${d.type}.png`)
     ;
 
-    let soldiers = game.selectAll(".soldier-option")
-        .data(soldiersData)
-        .enter()
-        .append("image")
-        .attr("xlink:href", "img/soldier.png")
-        .attr("class", "soldier-option")
-        .attr("width", d => types[d.type].width)
-        .attr("height", d => types[d.type].height)
-        .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height /2 );
 
     let normalCells = game.selectAll(".normal-cell")
         .data(normalCellData)
@@ -153,15 +139,18 @@ function main() {
         .attr("y", d => d.y - types[d.type].height / 2)
     ;
 
-    game.selectAll(".rectangles")
-        .data([{}])
+    game.select("#toolbar").raise()
+
+    let soldiers = game.selectAll(".soldier-option")
+        .data(soldiersData)
         .enter()
-        .append("rect")
-        .attr('y', 300)
-        .attr('x', 0)
-        .attr('width', 300)
-        .attr('height', 30)
-        .attr('fill', 'pink');
+        .append("image")
+        .attr("xlink:href", "img/soldier.png")
+        .attr("class", "soldier-option")
+        .attr("width", d => types[d.type].width)
+        .attr("height", d => types[d.type].height)
+        .attr("x", d => d.x - types[d.type].width / 2)
+        .attr("y", d => d.y - types[d.type].height /2 );
 
     requestAnimationFrame(frame);
 
