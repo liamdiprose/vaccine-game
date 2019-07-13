@@ -60,10 +60,15 @@ let soldiersData = [
     { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
 
-function addSoldier(game) {
-    game.selectAll(".soldier")
-      .data()
-}
+let memoryData = [
+    { enabled: false, x: 150,  y: 316, type: "memory" },
+    { enabled: false, x: 190, y: 316, type: "memory" },
+];
+
+// function addSoldier(game) {
+//     game.selectAll(".soldier")
+//     ;.data()
+// }
 
 let virusData = [
     { x: 30, y: 60, type: "snake" },
@@ -77,7 +82,7 @@ function magnitude(x, y) {
 
 function nearest_cell(self, cells, pred) {
 
-    let min_soldier
+    let min_soldier;
     let min_distance = 10000000000000;
     for (let cell of cells) {
         if (pred && !pred(cell)) continue;
@@ -129,6 +134,35 @@ function check_for_collision() {
                 virus.dead = true;
             }
         }
+    }
+    function distance(x, y, x2, y2) {
+        return Math.sqrt((x - x2)**2 + (y - y2)**2);
+    }
+    function closest(me, posObjs) {
+        let current_closest = posObjs[0];
+        for (let obj in posObjs) {
+            if (distance(obj.x, obj.y, me.x, me.y) < distance(obj.x, obj.y, current_closest.x, current_closest.y) ) {
+                current_closest = obj;
+            }
+        }
+        return current_closest;
+    }
+
+    for (let memory of memoryData) {
+        const MEMORY_ACTIVATE_THRES = 30;
+        let closest_baddy = closest(memory, virusData);
+        if (distance(memory, closest_baddy) < MEMORY_ACTIVATE_THRES) {
+            // TODO: Activate Memory cell
+        }
+    }
+
+    let memories = game.selectAll(".memory")
+        .data(memoryData.map(memory => {
+
+        }))
+        .enter();
+
+    for (let memory of memoryData) {
     }
 }
 
@@ -197,9 +231,9 @@ function frame() {
 }
 
 function redraw() {
-    game.select("#toolbar").raise()
-    game.selectAll(".soldier").raise()
-    game.selectAll(".memory").raise()
+    game.select("#toolbar").raise();
+    game.selectAll(".soldier").raise();
+    game.selectAll(".memory").raise();
 }
 
 function main() {
@@ -239,7 +273,7 @@ function main() {
         .attr("y", d => d.y - types[d.type].height /2 );
 
     let memories = game.selectAll(".memory")
-        .data([{x: 153, y: 314, type: "memory"}])
+        .data(memoryData)
         .enter()
         .append("image")
         .attr("xlink:href", "img/memory-active.png")
@@ -253,7 +287,7 @@ function main() {
 
     var soldierDrag = d3.drag()
         .on("start", (d) => {
-            console.log(`Started d: ${d.x}`);
+            console.log(`Started dragging: ${d.x}`);
         })
         .on("drag", function (d) {
             d3.select(this)
