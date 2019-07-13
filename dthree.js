@@ -157,14 +157,6 @@ function check_for_collision() {
         }
     }
 
-    let memories = game.selectAll(".memory")
-        .data(memoryData.map(memory => {
-
-        }))
-        .enter();
-
-    for (let memory of memoryData) {
-    }
 }
 
 function frame() {
