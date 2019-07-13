@@ -140,10 +140,9 @@ function main() {
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height /2 )
-    ;
+        .attr("y", d => d.y - types[d.type].height /2 );
 
-    let normalCells = game.selectAll(".askjdfhkajs")
+    let normalCells = game.selectAll(".normal-cell")
         .data(normalCellData)
         .enter()
         .append("image")
@@ -154,24 +153,23 @@ function main() {
         .attr("y", d => d.y - types[d.type].height / 2)
     ;
 
-    game.selectAll(".asdasd")
-    .data([{}])
-    .enter()
-    .append("rect")
-    .attr('y', 300)
-    .attr('x', 0)
-    .attr('width', 300)
-    .attr('height', 30)
-    .attr('fill', 'pink');
-
+    game.selectAll(".rectangles")
+        .data([{}])
+        .enter()
+        .append("rect")
+        .attr('y', 300)
+        .attr('x', 0)
+        .attr('width', 300)
+        .attr('height', 30)
+        .attr('fill', 'pink');
 
     requestAnimationFrame(frame);
 
     var dragHandler = d3.drag()
         .on("drag", function (d) {
             d3.select(this)
-                .style("left", d.x = (d3.event.x - d.width / 2) +'px')
-                .style("top", d.y = (d3.event.y - d.width / 2) + 'px');
+                .attr("cx", d.x = d3.event.x)
+                .attr("cy", d.y = d3.event.y);
         });
 
     dragHandler(game.selectAll(".soldier-option"));
