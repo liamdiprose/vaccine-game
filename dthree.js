@@ -121,7 +121,7 @@ var soldierDrag = d3.drag()
          .attr("cy", d.y = d3.event.y);
  });
 
-let num_cells = 15;
+let num_cells = 40;
 let normalCellData = (function () {
     let cells = [];
     for (let i = 0; i < num_cells; i++) {
@@ -136,10 +136,10 @@ let normalCellData = (function () {
 })();
 
 let soldiersData = [
-//    { enabled: false, x: 30,  y: 316, type: "soldier" },
-//    { enabled: false, x: 60,  y: 316, type: "soldier" },
-//    { enabled: false, x: 90,  y: 316, type: "soldier" },
-//    { enabled: false, x: 120, y: 316, type: "soldier" },
+    //    { enabled: false, x: 30,  y: 316, type: "soldier" },
+    //    { enabled: false, x: 60,  y: 316, type: "soldier" },
+    //    { enabled: false, x: 90,  y: 316, type: "soldier" },
+    //    { enabled: false, x: 120, y: 316, type: "soldier" },
 ];
 
 let memoryData = [
@@ -346,9 +346,15 @@ function frame() {
             }
         }
     }
+    let health = Math.round(100 - 100 * stats.infected / num_cells);
     body_parts[0].stage = Math.min(2, Math.floor(stats.virus1 / (num_cells / 6)));
     body_parts[1].stage = Math.min(2, Math.floor(stats.virus2 / (num_cells / 6)));
     body_parts[2].stage = Math.min(2, Math.floor(stats.virus3 / (num_cells / 6)));
+
+    d3
+        .select("#healthbar div")
+        .text(health + "%")
+        ;
 
     d3
         .selectAll(".body-image")
@@ -389,7 +395,7 @@ function redraw() {
 
 function makeSoldier(game) {
 
-    if (toolbarSlots.length >= 6) 
+    if (toolbarSlots.length >= 6)
         return game.selectAll(".soldier");
 
     data = {};
@@ -494,7 +500,7 @@ function main() {
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height /2 );
+        .attr("y", d => d.y - types[d.type].height / 2);
 
     let memories = game.selectAll(".memory")
         .data(memoryData)
@@ -506,7 +512,7 @@ function main() {
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
-        .attr("y", d => d.y - types[d.type].height /2 );
+        .attr("y", d => d.y - types[d.type].height / 2);
 
     requestAnimationFrame(frame);
 
