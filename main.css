@@ -4,20 +4,22 @@
 }
 
 .virus.virus-snake {
-    width: 100px;
+    width: 57px;
 }
 
 .virus.virus-cucumber {
-    width: 100px;
+    width: 60px;
 }
 
 .virus.virus-tenticle {
-    width: 100px;
+    width: 60px;
 }
 
 #toolbar {
     position: relative;
+    z-index: -10;
 }
+
 
 .soldier-option {
     position: absolute;

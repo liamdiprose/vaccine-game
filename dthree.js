@@ -38,6 +38,13 @@ let virusData = [
     { x: 30, y: 60, type: "snake" },
 ];
 
+let soldiersData = [
+    { enabled: false, x: 30, y: 320 },
+    { enabled: false, x: 30, y: 320 },
+    { enabled: false, x: 30, y: 320 },
+    { enabled: false, x: 30, y: 320 },
+]
+
 function main() {
     requestAnimationFrame(frame);
 
@@ -51,15 +58,24 @@ function main() {
 
 
     var dragHandler = d3.drag()
-        .on("drag", function () {
+        .on("drag", function (d) {
             d3.select(this)
-                .style("left", '' + d3.event.x +'px')
-                .style("top", '' + d3.event.y + 'px');
+                .style("left", d.x = d3.event.x +'px')
+                .style("top", d.y = d3.event.y + 'px');
         });
 
-    soliderOptions = d3.selectAll(".soldier-option");
+    let soldierOptions = game.selectAll(".soldier-option")
+        .data(soldiersData)
+        .enter()
+        .append("img")
+        .attr("src", "img/soldier.png")
+        .attr("class", "soldier-option")
+        .style("width", "30px")
+        .style("left", (d) => d.x + 'px')
+        .style("top", (d) => d.y + 'px')
+        .style("width", "30px");
 
-    dragHandler(soliderOptions);
+    dragHandler(game.selectAll(".soldier-option"));
     
 
     setTimeout(() => {
