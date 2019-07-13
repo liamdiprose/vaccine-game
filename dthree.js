@@ -34,8 +34,9 @@ let types = {
     memory: {
         width: 25,
         height: 25,
-        collision_radius: 15,
+        collision_radius: 50,
         default_image: "img/memory-inactive.png",
+        activated_image: "img/memory-active.png",
     }
 };
 
@@ -61,8 +62,8 @@ let soldiersData = [
 ];
 
 let memoryData = [
-    { enabled: false, x: 150,  y: 316, type: "memory", unique: 1 },
-    { enabled: false, x: 190, y: 316, type: "memory", unique: 2},
+    { enabled: false, activated: false, x: 150,  y: 316, type: "memory", id: 1 },
+    { enabled: false, activated: false, x: 190, y: 316, type: "memory", id: 2},
 ];
 
 // function addSoldier(game) {
@@ -128,6 +129,7 @@ function check_for_collision() {
 
 
     for (let soldier of soldiersData) {
+        if (!soldier.enabled) continue;
         for (let virus of virusData) {
             if (magnitude(virus.x - soldier.x, virus.y - soldier.y) < types[virus.type].collision_radius + types[soldier.type].collision_radius
                 && !virus.dead) {
@@ -135,25 +137,14 @@ function check_for_collision() {
             }
         }
     }
-    function distance(x, y, x2, y2) {
-        return Math.sqrt((x - x2)**2 + (y - y2)**2);
-    }
-    function closest(me, posObjs) {
-        let current_closest = posObjs[0];
-        for (let obj in posObjs) {
-            if (distance(obj.x, obj.y, me.x, me.y) < distance(obj.x, obj.y, current_closest.x, current_closest.y) ) {
-                current_closest = obj;
-            }
-        }
-        return current_closest;
-    }
-
     for (let memory of memoryData) {
-        const MEMORY_ACTIVATE_THRES = 30;
-        let closest_baddy = closest(memory, virusData);
-        if (distance(memory, closest_baddy) < MEMORY_ACTIVATE_THRES) {
-            // TODO: Activate Memory cell
-            console.log("A memory cell saw a baddy!");
+        if (!memory.enabled) continue;
+        for (let virus of virusData) {
+            if (magnitude(virus.x - memory.x, virus.y - memory.y) < types[virus.type].collision_radius + types[memory.type].collision_radius
+                && !virus.dead) {
+                memory.activated = true;
+
+            }
         }
     }
 
@@ -189,6 +180,8 @@ function frame() {
     }
 
     for (let soldier of soldiersData) {
+        if (!soldier.enabled) continue;
+
         let nearest = nearest_cell(soldier, virusData, c => !c.targeted && !c.dead);
         if (nearest) {
             nearest.targeted = true;
@@ -211,6 +204,8 @@ function frame() {
                 return "img/normal-infected.png";
             } else if (d.dead) {
                 return "";
+            } else if (d.type === "memory" && d.activated) {
+                return types[d.type].activated_image;
             } else {
                 return types[d.type].default_image;
             }
@@ -270,7 +265,7 @@ function main() {
         .append("image")
         .attr("xlink:href", "img/memory-active.png")
         .attr("class", "memory")
-        .attr("id", d => d.unique)
+        .attr("id", d => d.id)
         .attr("width", d => types[d.type].width)
         .attr("height", d => types[d.type].height)
         .attr("x", d => d.x - types[d.type].width / 2)
@@ -280,9 +275,13 @@ function main() {
 
     var soldierDrag = d3.drag()
         .on("start", (d) => {
-            console.log(`Started dragging: ${d.x}`);
+                // TO DO: set enabled on max's array
+            // d.enabled = true;
         })
+        .on("end", d => {d.enabled = true})
         .on("drag", function (d) {
+            if (d.type === "soldier" && d.enabled) return;
+            if (d.type === "memory" && d.enabled) return;
             d3.select(this)
                 .attr("cx", d.x = d3.event.x)
                 .attr("cy", d.y = d3.event.y);
