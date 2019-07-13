@@ -146,7 +146,7 @@ let soldiersData = [
 let memoryData = [
     { enabled: false, activated: false, x: 270,  y: 316, type: "memory", id: 1 },
     { enabled: false, activated: false, x: 240, y: 316, type: "memory", id: 2},
-    { enabled: false, activated: false, x: 210, y: 316, type: "memory", id: 3},
+    // { enabled: false, activated: false, x: 210, y: 316, type: "memory", id: 3},
 ];
 
 // function addSoldier(game) {
@@ -155,9 +155,9 @@ let memoryData = [
 // }
 
 let virusData = [
-    { x: 30, y: 60, type: "snake" },
-    { x: 60, y: 60, type: "cucumber" },
-    { x: 90, y: 60, type: "tenticle" },
+    { x: 20, y: 20, type: "snake" },
+    { x: 150, y: 20, type: "cucumber" },
+    { x: 20, y: 150, type: "tenticle" },
 ];
 
 let toolbarSlots = [];
@@ -235,28 +235,10 @@ function check_for_collision() {
                     memory.activated = true;
                     setTimeout(() => {
                             soldierDrag(makeSoldier(game));
-                            //recalcToolbarXs();
+                            recalcToolbarXs();
                             setTimeout(() => {
                                     soldierDrag(makeSoldier(game));
-                                    //recalcToolbarXs()
-                    setTimeout(() => {
-                            soldierDrag(makeSoldier(game));
-                            //recalcToolbarXs();
-                            setTimeout(() => {
-                                    soldierDrag(makeSoldier(game));
-                                    //recalcToolbarXs()
-                    setTimeout(() => {
-                            soldierDrag(makeSoldier(game));
-                            //recalcToolbarXs();
-                            setTimeout(() => {
-                                    soldierDrag(makeSoldier(game));
-                                    //recalcToolbarXs()
-                            }, 2000);
-                    }
-                    , 2000);
-                            }, 2000);
-                    }
-                    , 2000);
+                                    recalcToolbarXs()
                             }, 2000);
                     }
                     , 2000);
