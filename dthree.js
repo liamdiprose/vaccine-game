@@ -31,7 +31,7 @@ let types = {
         collsion_radius: 15,
         default_image: "img/virus_tenticle.png",
     },
-}
+};
 
 let normalCellData = (function () {
     let num_cells = 10;
@@ -92,9 +92,6 @@ function check_for_collision() {
 function frame() {
 
     for (let virus of virusData) {
-        //virus.x += Math.random() * 2 - 1;
-        //virus.y += Math.random() * 2 - 1;
-
         let nearest = nearest_cell(virus);
         let dir_x = nearest.x - virus.x;
         let dir_y = nearest.y - virus.y;
@@ -107,7 +104,6 @@ function frame() {
     }
 
     let allCells = game.selectAll("image") // offset after they move
-        //.transition()
         .attr("x", (d) => d.x - types[d.type].width / 2)
         .attr("y", (d) => d.y - types[d.type].height / 2)
         .attr("href", d => {
@@ -120,8 +116,6 @@ function frame() {
         ;
 
     check_for_collision();
-
-
 
     requestAnimationFrame(frame);
 }
@@ -171,7 +165,8 @@ function main() {
         .attr('x', 0)
         .attr('width', 300)
         .attr('height', 30)
-        .attr('fill', 'pink');
+        .attr('fill', 'pink')
+        ;
 
     requestAnimationFrame(frame);
 
@@ -183,8 +178,6 @@ function main() {
         });
 
     dragHandler(game.selectAll(".soldier-option"));
-
-    // dragHandler(viruses);
 }
 
 main();
