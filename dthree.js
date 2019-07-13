@@ -98,15 +98,16 @@ let types = {
 };
 var soldierDrag = d3.drag()
  .on("start", (d) => {
-    toolbarSlots = toolbarSlots.filter(e => e !== d);
+    // toolbarSlots = toolbarSlots.filter(e => e.dragged);
     console.log(`started to drag: ${d}`);
     d.dragged = true;
  })
  .on("end", d => {
-        recalcToolbarXs();
+        //recalcToolbarXs();
         console.log(`finished to drag: ${d.type}`);
         console.log(`finished. dragged?: ${d.dragged}`);
-        toolbarSlots = toolbarSlots.filter(e => e !== d);
+        // toolbarSlots = toolbarSlots.filter(e => e.dragged);
+
          if (d.type === "soldier"){
             soldiersData.push(d);
          }
@@ -232,22 +233,22 @@ function check_for_collision() {
                     memory.activated = true;
                     setTimeout(() => {
                             soldierDrag(makeSoldier(game));
-                            recalcToolbarXs();
+                            //recalcToolbarXs();
                             setTimeout(() => {
                                     soldierDrag(makeSoldier(game));
-                                    recalcToolbarXs()
+                                    //recalcToolbarXs()
                     setTimeout(() => {
                             soldierDrag(makeSoldier(game));
-                            recalcToolbarXs();
+                            //recalcToolbarXs();
                             setTimeout(() => {
                                     soldierDrag(makeSoldier(game));
-                                    recalcToolbarXs()
+                                    //recalcToolbarXs()
                     setTimeout(() => {
                             soldierDrag(makeSoldier(game));
-                            recalcToolbarXs();
+                            //recalcToolbarXs();
                             setTimeout(() => {
                                     soldierDrag(makeSoldier(game));
-                                    recalcToolbarXs()
+                                    //recalcToolbarXs()
                             }, 2000);
                     }
                     , 2000);
@@ -421,6 +422,8 @@ function makeSoldier(game) {
 }
 
 function recalcToolbarXs() {
+
+    return;
 
     let i = 0;
     for (let slot of toolbarSlots) {
